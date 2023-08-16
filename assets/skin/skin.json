@@ -62,6 +62,12 @@
 		"b": 1,
 		"a": 0
 	},
+	"dark-gray": {
+		"r": 0.13333334,
+		"g": 0.13333334,
+		"b": 0.13333334,
+		"a": 1
+	},
 	"debt": {
 		"r": 1,
 		"g": 0,
@@ -317,6 +323,88 @@
 		"regions": [],
 		"playMode": 2,
 		"crushMode": 0
+	},
+	"black": {
+		"region": "white",
+		"color": "black",
+		"horizontalStretchAreas": [ 0, 0 ],
+		"verticalStretchAreas": [ 0, 0 ],
+		"tiling": false,
+		"minWidth": 1,
+		"minHeight": 1,
+		"rightWidth": 0,
+		"leftWidth": 0,
+		"bottomHeight": 0,
+		"topHeight": 0,
+		"offsetX": 0,
+		"offsetY": 0,
+		"offsetXspeed": 0,
+		"offsetYspeed": 0,
+		"frameDuration": 0.03,
+		"regions": [],
+		"playMode": 2,
+		"crushMode": 0
+	},
+	"textfield-selection": {
+		"region": "white",
+		"color": "subtitle",
+		"horizontalStretchAreas": [ 0, 0 ],
+		"verticalStretchAreas": [ 0, 0 ],
+		"tiling": false,
+		"minWidth": 1,
+		"minHeight": 1,
+		"rightWidth": 0,
+		"leftWidth": 0,
+		"bottomHeight": 0,
+		"topHeight": 0,
+		"offsetX": 0,
+		"offsetY": 0,
+		"offsetXspeed": 0,
+		"offsetYspeed": 0,
+		"frameDuration": 0.03,
+		"regions": [],
+		"playMode": 2,
+		"crushMode": 0
+	},
+	"textfield-10": {
+		"region": "textfield",
+		"horizontalStretchAreas": [ 5, 117 ],
+		"verticalStretchAreas": [ 5, 24 ],
+		"tiling": false,
+		"minWidth": 123,
+		"minHeight": 30,
+		"rightWidth": 6,
+		"leftWidth": 6,
+		"bottomHeight": 1,
+		"topHeight": 1,
+		"offsetX": 0,
+		"offsetY": 0,
+		"offsetXspeed": 0,
+		"offsetYspeed": 0,
+		"frameDuration": 0.03,
+		"regions": [],
+		"playMode": 2,
+		"crushMode": 0
+	},
+	"vamp-border-10": {
+		"region": "vamp-border",
+		"horizontalStretchAreas": [ 4, 143 ],
+		"verticalStretchAreas": [ 4, 159 ],
+		"tiling": false,
+		"minWidth": 148,
+		"minHeight": 164,
+		"rightWidth": 4,
+		"leftWidth": 4,
+		"bottomHeight": 4,
+		"topHeight": 4,
+		"offsetX": 0,
+		"offsetY": 0,
+		"offsetXspeed": 0,
+		"offsetYspeed": 0,
+		"frameDuration": 0.03,
+		"regions": [],
+		"playMode": 2,
+		"crushMode": 0
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
@@ -404,8 +492,10 @@
 "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
 	"default": {
 		"font": "font",
+		"disabledFontColor": "dark-gray",
 		"up": "selection-invisible",
 		"over": "selection-10",
+		"disabled": "selection-invisible",
 		"pressedOffsetY": -1
 	},
 	"very-small": {
@@ -420,6 +510,15 @@
 		"up": "selection-invisible",
 		"over": "selection-10",
 		"pressedOffsetY": -1
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
+	"default": {
+		"font": "small",
+		"fontColor": "black",
+		"background": "textfield-10",
+		"cursor": "black",
+		"selection": "textfield-selection"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {

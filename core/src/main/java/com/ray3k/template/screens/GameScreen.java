@@ -4,15 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ray3k.template.*;
 
+import java.security.MessageDigest;
 import java.util.Locale;
+import java.util.Vector;
 
 import static com.ray3k.template.Core.*;
 import static com.ray3k.template.Resources.*;
@@ -24,7 +28,7 @@ public class GameScreen extends JamScreen {
     public Stage stage;
     public Table root;
     public static long cash;
-    public static int debt;
+    public static long debt;
     public final static int LOAN_MINIMUM = 250;
     public static int debtRate;
     public static int loanOffer;
@@ -33,7 +37,7 @@ public class GameScreen extends JamScreen {
     public final static int LOAN_OFF_MAXIMUM = 1500;
     public final static int LOAN_RATE_MINIMUM = 12;
     public final static int LOAN_RATE_MAXIMUM = 25;
-    public static int bank;
+    public static long bank;
     public static int bankRate;
     public static String weapon;
     public static int health;
@@ -81,7 +85,8 @@ public class GameScreen extends JamScreen {
     public final static IntArray battleIntervals = new IntArray();
     public final static ObjectMap<String, Integer> inventory = new ObjectMap<>();
     public final static ObjectMap<String, Integer> averagePaidPrice = new ObjectMap<>();
-    public final static Array<String> vampires = new Array<>(new String[] {"Beast Vampire", "Bride Vampire", "Noble Vampire", "Pharoah Vampire"});
+    public final static Array<String> vampires = new Array<>(new String[] {"Beast Vampire", "Bride Vampire", "Noble Vampire", "Pharaoh Vampire"});
+    public final static Array<String> vampireImages = new Array<>(new String[] {"beast", "bride", "noble", "pharoah"});
     public final static IntArray vampireDamages = new IntArray(new int[] {5, 10, 15, 20});
     public final static IntArray vampireAccuracies = new IntArray(new int[] {50, 60, 65, 70});
     public final static IntArray rewards = new IntArray(new int[] {2000, 3000, 10000, 100000});
@@ -133,7 +138,7 @@ public class GameScreen extends JamScreen {
         accuracy = 0;
         runAwayIndex = 0;
         day = -1;
-        dayMax = 2;
+        dayMax = 30;
         inventory.clear();
         averagePaidPrice.clear();
         beastiaryUnlock = 0;
@@ -268,7 +273,13 @@ public class GameScreen extends JamScreen {
     @Override
     public void show() {
         super.show();
-    
+        
+        try {
+            GameJoltApi.crypt = MessageDigest.getInstance("MD5");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         gameScreen = this;
         BG_COLOR.set(Color.BLACK);
     
@@ -313,7 +324,7 @@ public class GameScreen extends JamScreen {
         var subTable = new Table();
         table.add(subTable);
         
-        label = new Label("$" + formatMoney( debt), skin, "debt");
+        label = new Label("$" + formatMoney(debt), skin, "debt");
         subTable.add(label);
         
         if (debt != 0) {
@@ -328,7 +339,7 @@ public class GameScreen extends JamScreen {
         subTable = new Table();
         table.add(subTable);
         
-        label = new Label("$" + formatMoney( bank), skin, "cash");
+        label = new Label("$" + formatMoney(bank), skin, "cash");
         subTable.add(label);
         
         label = new Label(" at " + bankRate + "%", skin, "cash-subtitle");
@@ -386,7 +397,7 @@ public class GameScreen extends JamScreen {
             
             if ((price > cash || inventoryCount >= inventoryMax) && itemCount == 0) button.setDisabled(true);
             
-            label = new Label("$" + formatMoney( price), skin, "small");
+            label = new Label("$" + formatMoney(price), skin, "small");
             label.setColor(color);
             button.add(label).spaceRight(30);
             
@@ -595,30 +606,61 @@ public class GameScreen extends JamScreen {
     private void showFinish() {
         var dialog = new Dialog("THE SHIP DEPARTS", skin);
         
-        dialog.getContentTable().defaults().space(20);
-        dialog.getContentTable().pad(10);
+        var table = dialog.getContentTable();
+        
+        table.defaults().space(20);
+        table.pad(10);
         var label = new Label(Gdx.files.internal("conclusion1.txt").readString(), skin, "small");
         label.setWrap(true);
-        dialog.getContentTable().add(label).growX();
+        table.add(label).growX();
         
         dialog.getContentTable().row();
         var image = new Image(skin, "title-small");
-        dialog.getContentTable().add(image);
+        table.add(image);
         
         dialog.getContentTable().row();
         label = new Label(Gdx.files.internal("conclusion2.txt").readString(), skin, "small");
         label.setWrap(true);
-        dialog.getContentTable().add(label).growX();
+        table.add(label).growX();
+        
+        table.row();
+        var subTable = new Table();
+        table.add(subTable);
+        
+        subTable.defaults().space(5);
+        label = new Label("Name:", skin, "small");
+        subTable.add(label);
+        
+        var textField = new TextField(MenuScreen.lastScoreName, skin);
+        subTable.add(textField);
+        
+        MenuScreen.lastScore = cash + bank - debt;
+        label = new Label("$" + formatMoney(MenuScreen.lastScore), skin, "small");
+        subTable.add(label);
         
         var textButton = new TextButton("FINISH", skin);
         dialog.button(textButton);
         onChange(textButton, () -> {
+            MenuScreen.lastScoreName = textField.getText();
+            MenuScreen.lastScore = cash + bank - debt;
+            if (MenuScreen.lastScore > preferences.getLong("highscore", -Long.MAX_VALUE)) {
+                preferences.putString("highscore-name", textField.getText());
+                preferences.putLong("highscore", MenuScreen.lastScore);
+                preferences.flush();
+            }
+            
+            GameJoltApi.addHighScore(MenuScreen.lastScore, textField.getText());
+            
             Gdx.input.setInputProcessor(null);
             core.transition(new MenuScreen());
         });
         
+        textButton.setDisabled(textField.getText().equals(""));
+        onChange(textField, () -> textButton.setDisabled(textField.getText().equals("")));
+        
         dialog.show(stage);
-        dialog.setSize(600, 400);
+        stage.setKeyboardFocus(textField);
+        dialog.setSize(600, 450);
         dialog.setPosition(512 - MathUtils.floor(dialog.getWidth() / 2), 288 - MathUtils.floor(dialog.getHeight() / 2));
     }
     
@@ -628,7 +670,7 @@ public class GameScreen extends JamScreen {
         var table = dialog.getContentTable();
         
         if (debt == 0) {
-            var label = new Label("The local mafia is offering up to $" + formatMoney( loanOffer) + " at " + loanRate + "% daily interest.\nThey assure you it's a great deal!", skin, "small");
+            var label = new Label("The local mafia is offering up to $" + formatMoney(loanOffer) + " at " + loanRate + "% daily interest.\nThey assure you it's a great deal!", skin, "small");
             table.add(label).colspan(2);
             
             table.row();
@@ -636,9 +678,9 @@ public class GameScreen extends JamScreen {
             table.add(slider).minWidth(SLIDER_MIN_WIDTH).growX();
             
             table.row();
-            var loanLabel = new Label("$" + formatMoney( MathUtils.round(slider.getValue())), skin, "debt");
+            var loanLabel = new Label("$" + formatMoney(MathUtils.round(slider.getValue())), skin, "debt");
             table.add(loanLabel);
-            onChange(slider, () -> loanLabel.setText("$" + formatMoney( MathUtils.round(slider.getValue()))));
+            onChange(slider, () -> loanLabel.setText("$" + formatMoney(MathUtils.round(slider.getValue()))));
             
             var textButton = new TextButton("ACCEPT", skin);
             dialog.button(textButton);
@@ -652,7 +694,7 @@ public class GameScreen extends JamScreen {
             textButton = new TextButton("CANCEL", skin);
             dialog.button(textButton);
         } else if (cash > 0) {
-            var label = new Label("You owe the mafia $" + formatMoney( debt) + " at " + debtRate + "% daily interest.\n\"It's the dough, or we gotta break something\"", skin, "small");
+            var label = new Label("You owe the mafia $" + formatMoney(debt) + " at " + debtRate + "% daily interest.\n\"It's the dough, or we gotta break something\"", skin, "small");
             table.add(label).colspan(2);
             
             table.row();
@@ -661,9 +703,9 @@ public class GameScreen extends JamScreen {
             table.add(slider).minWidth(SLIDER_MIN_WIDTH);
             
             table.row();
-            var loanLabel = new Label("$" + formatMoney( MathUtils.round(slider.getValue())), skin, "debt");
+            var loanLabel = new Label("$" + formatMoney(MathUtils.round(slider.getValue())), skin, "debt");
             table.add(loanLabel);
-            onChange(slider, () -> loanLabel.setText("$" + formatMoney( MathUtils.round(slider.getValue()))));
+            onChange(slider, () -> loanLabel.setText("$" + formatMoney(MathUtils.round(slider.getValue()))));
             
             var textButton = new TextButton("PAY", skin);
             dialog.button(textButton);
@@ -711,7 +753,7 @@ public class GameScreen extends JamScreen {
         
         var table = dialogWithdraw.getContentTable();
         
-        var label = new Label("You have $" + formatMoney( bank) + " in the bank.\nInterest is compounded daily at " + bankRate + "%.", skin, "small");
+        var label = new Label("You have $" + formatMoney(bank) + " in the bank.\nInterest is compounded daily at " + bankRate + "%.", skin, "small");
         table.add(label).colspan(2);
         
         table.row();
@@ -720,9 +762,9 @@ public class GameScreen extends JamScreen {
         table.add(withdrawSlider).minWidth(SLIDER_MIN_WIDTH);
         
         table.row();
-        var withdrawLabel = new Label("$" + formatMoney( MathUtils.round(withdrawSlider.getValue())), skin, "debt");
+        var withdrawLabel = new Label("$" + formatMoney(MathUtils.round(withdrawSlider.getValue())), skin, "debt");
         table.add(withdrawLabel);
-        onChange(withdrawSlider, () -> withdrawLabel.setText("$" + formatMoney( MathUtils.round(withdrawSlider.getValue()))));
+        onChange(withdrawSlider, () -> withdrawLabel.setText("$" + formatMoney(MathUtils.round(withdrawSlider.getValue()))));
         
         var textButton = new TextButton("WITHDRAW", skin);
         dialogWithdraw.button(textButton);
@@ -741,7 +783,7 @@ public class GameScreen extends JamScreen {
         
         table = dialogDeposit.getContentTable();
         
-        label = new Label("You have $" + formatMoney( bank) + " in the bank.\nInterest is compounded daily at " + bankRate + "%.", skin, "small");
+        label = new Label("You have $" + formatMoney(bank) + " in the bank.\nInterest is compounded daily at " + bankRate + "%.", skin, "small");
         table.add(label).colspan(2);
         
         table.row();
@@ -750,9 +792,9 @@ public class GameScreen extends JamScreen {
         table.add(depositSlider).minWidth(SLIDER_MIN_WIDTH);
         
         table.row();
-        var depositLabel = new Label("$" + formatMoney( MathUtils.round(depositSlider.getValue())), skin, "debt");
+        var depositLabel = new Label("$" + formatMoney(MathUtils.round(depositSlider.getValue())), skin, "debt");
         table.add(depositLabel);
-        onChange(depositSlider, () -> depositLabel.setText("$" + formatMoney( MathUtils.round(depositSlider.getValue()))));
+        onChange(depositSlider, () -> depositLabel.setText("$" + formatMoney(MathUtils.round(depositSlider.getValue()))));
         
         textButton = new TextButton("DEPOSIT", skin);
         dialogDeposit.button(textButton);
@@ -903,7 +945,7 @@ public class GameScreen extends JamScreen {
             button.add(label);
             
             button.row();
-            label = new Label("$" + formatMoney( price), skin, "very-small");
+            label = new Label("$" + formatMoney(price), skin, "very-small");
             button.add(label);
             
             if (owned || cash >= price) {
@@ -1144,7 +1186,7 @@ public class GameScreen extends JamScreen {
         
         var table = dialog.getContentTable();
         
-        var label = new Label("How many " + item + " do you want to buy at $" + formatMoney( price) + " each?" + (itemCount > 0 ? "\nYou have " + itemCount + " " + item + ".": ""), skin, "small");
+        var label = new Label("How many " + item + " do you want to buy at $" + formatMoney(price) + " each?" + (itemCount > 0 ? "\nYou have " + itemCount + " " + item + ".": ""), skin, "small");
         table.add(label).colspan(2);
         
         table.row();
@@ -1154,11 +1196,11 @@ public class GameScreen extends JamScreen {
         
         table.row();
         var count = MathUtils.round(slider.getValue());
-        var loanLabel = new Label("x" + count + " ($" + formatMoney( count * price) + ")", skin, "small-red");
+        var loanLabel = new Label("x" + count + " ($" + formatMoney(count * price) + ")", skin, "small-red");
         table.add(loanLabel);
         onChange(slider, () -> {
             var newCount = MathUtils.round(slider.getValue());
-            loanLabel.setText("x" + newCount + " ($" + formatMoney( newCount * price) + ")");
+            loanLabel.setText("x" + newCount + " ($" + formatMoney(newCount * price) + ")");
         });
         
         var textButton = new TextButton("BUY", skin);
@@ -1188,8 +1230,8 @@ public class GameScreen extends JamScreen {
         
         var table = dialog.getContentTable();
         
-        var label = new Label("How many " + item + " do you want to sell at $" + formatMoney( price) + " each?" + "\nYou have " + itemCount + " " + item +
-                (averagePaidPrice.containsKey(item) ? ".\nYou've paid $" + formatMoney( averagePaidPrice.get(item)) + " for each of them on average." : ""), skin, "small");
+        var label = new Label("How many " + item + " do you want to sell at $" + formatMoney(price) + " each?" + "\nYou have " + itemCount + " " + item +
+                (averagePaidPrice.containsKey(item) ? ".\nYou've paid $" + formatMoney(averagePaidPrice.get(item)) + " for each of them on average." : ""), skin, "small");
         table.add(label).colspan(2);
         
         table.row();
@@ -1199,11 +1241,11 @@ public class GameScreen extends JamScreen {
         
         table.row();
         var count = MathUtils.round(slider.getValue());
-        var loanLabel = new Label("x" + count + " ($" + formatMoney( count * price) + ")", skin, "small-red");
+        var loanLabel = new Label("x" + count + " ($" + formatMoney(count * price) + ")", skin, "small-red");
         table.add(loanLabel);
         onChange(slider, () -> {
             var newCount = MathUtils.round(slider.getValue());
-            loanLabel.setText("x" + newCount + " ($" + formatMoney( newCount * price) + ")");
+            loanLabel.setText("x" + newCount + " ($" + formatMoney(newCount * price) + ")");
         });
         
         var textButton = new TextButton("SELL", skin);
@@ -1251,8 +1293,8 @@ public class GameScreen extends JamScreen {
         dialog.getContentTable().add(label);
         
         dialog.getContentTable().row();
-        label = new Label(cash >= price ? "Purchase " + pockets + " for $" + formatMoney( price) + "." :
-                "Yikes! You're too poor to even pay a beggar $" + formatMoney( price) + " for " + pockets + " pockets." +
+        label = new Label(cash >= price ? "Purchase " + pockets + " for $" + formatMoney(price) + "." :
+                "Yikes! You're too poor to even pay a beggar $" + formatMoney(price) + " for " + pockets + " pockets." +
                         "\nWhat a loser...", skin, "small");
         dialog.getContentTable().add(label);
         
@@ -1297,7 +1339,7 @@ public class GameScreen extends JamScreen {
             if (MathUtils.randomBoolean(CHEST_REWARD_CHANCE)) {
                 var dialog2 = new Dialog("FAT STACKS!", skin);
                 
-                var rewardLabel = new Label("You open the chest to discover $" + formatMoney( reward) + ".\nGotta get that paper!", skin, "small");
+                var rewardLabel = new Label("You open the chest to discover $" + formatMoney(reward) + ".\nGotta get that paper!", skin, "small");
                 rewardLabel.setAlignment(Align.center);
                 dialog2.getContentTable().add(rewardLabel);
                 
@@ -1508,7 +1550,7 @@ public class GameScreen extends JamScreen {
         
         dialog.getContentTable().row();
         label = new Label(cash >= previewWeaponPrice ? "" : "The gentleman scoffs at your mere $" + formatMoney(cash) +
-                        ".\nYou need $" + formatMoney( previewWeaponPrice) + ". Pathetic!", skin, "small");
+                        ".\nYou need $" + formatMoney(previewWeaponPrice) + ". Pathetic!", skin, "small");
         label.setAlignment(Align.center);
         dialog.getContentTable().add(label);
         
@@ -1620,7 +1662,7 @@ public class GameScreen extends JamScreen {
         dialog.getContentTable().add(label).growX();
         
         dialog.getContentTable().row();
-        label = new Label("You lost $" + formatMoney( cash) + ".", skin, "small");
+        label = new Label("You lost $" + formatMoney(cash) + ".", skin, "small");
         dialog.getContentTable().add(label);
         
         var textButton = new TextButton("CRY A LITTLE AND MOVE ON", skin);
@@ -1718,7 +1760,7 @@ public class GameScreen extends JamScreen {
         dialog.button(textButton);
         
         dialog.show(stage);
-        dialog.setSize(600, 400);
+        dialog.setSize(600, 450);
         dialog.setPosition(512 - MathUtils.floor(dialog.getWidth() / 2), 288 - MathUtils.floor(dialog.getHeight() / 2));
     }
     
@@ -1762,7 +1804,13 @@ public class GameScreen extends JamScreen {
     
     private void showBattle() {
         vampireHealth = VAMPIRE_HEALTH_MAX;
-        var dialog = new Dialog("VAMPIRE ATTACK", skin);
+        var vampTable = new Table();
+        var dialog = new Dialog("VAMPIRE ATTACK", skin) {
+            @Override
+            protected void result(Object object) {
+                vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
+            }
+        };
         
         var table = dialog.getContentTable();
         
@@ -1806,18 +1854,38 @@ public class GameScreen extends JamScreen {
         dialog.show(stage);
         dialog.setSize(600, 350);
         dialog.setPosition(512 - MathUtils.floor(dialog.getWidth() / 2), 288 - MathUtils.floor(dialog.getHeight() / 2));
+        
+        vampTable.setBackground(skin.getDrawable("vamp-border-10"));
+        stage.addActor(vampTable);
+        vampTable.addAction(Actions.sequence(Actions.color(new Color(1, 1, 1, 0)), Actions.fadeIn(.25f)));
+        var image = new Image(skin, vampireImages.get(Math.min(beastiaryUnlock, 3)));
+        image.setScaling(Scaling.none);
+        vampTable.add(image);
+        vampTable.pack();
+        temp.set(dialog.getX(Align.right), dialog.getY(Align.center));
+        vampTable.setPosition(temp.x, temp.y, Align.left);
     }
     
     private void showRun() {
         var success = MathUtils.randomBoolean(runawayChances.get(runAwayIndex)) || goodBattleOmen;
         var hurt = MathUtils.randomBoolean((vampireAccuracies.get(Math.min(beastiaryUnlock, 3)) + (badBattleOmen ? BAD_OMEN_VAMPIRE_ACCURACY_BONUS : 0)) / 100f);
-        var dialog = new Dialog("RUN AWAY", skin);
+        
+        var vampTable = new Table();
+        
+        var dialog = new Dialog("RUN AWAY", skin) {
+            @Override
+            protected void result(Object object) {
+                vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
+            }
+        };
         
         var table = dialog.getContentTable();
         
         table.defaults().space(20);
         table.pad(10);
         if (success) {
+            vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
+            
             var label = new Label("You managed to get away!", skin, "small");
             table.add(label);
             
@@ -1886,13 +1954,30 @@ public class GameScreen extends JamScreen {
         dialog.show(stage);
         dialog.setSize(600, 300);
         dialog.setPosition(512 - MathUtils.floor(dialog.getWidth() / 2), 288 - MathUtils.floor(dialog.getHeight() / 2));
+        
+        vampTable.setBackground(skin.getDrawable("vamp-border-10"));
+        stage.addActor(vampTable);
+        vampTable.addAction(Actions.sequence(Actions.color(new Color(1, 1, 1, 0)), Actions.fadeIn(.25f)));
+        var image = new Image(skin, vampireImages.get(Math.min(beastiaryUnlock, 3)));
+        image.setScaling(Scaling.none);
+        vampTable.add(image);
+        vampTable.pack();
+        temp.set(dialog.getX(Align.right), dialog.getY(Align.center));
+        vampTable.setPosition(temp.x, temp.y, Align.left);
     }
     
     private void showAttack() {
         var success = MathUtils.randomBoolean((accuracy + (goodBattleOmen ? GOOD_BATTLE_OMEN_ACCURACY_BONUS : 0)) / 100f);
         var hurt = MathUtils.randomBoolean((vampireAccuracies.get(Math.min(beastiaryUnlock, 3)) + (badBattleOmen ? BAD_OMEN_VAMPIRE_ACCURACY_BONUS : 0)) / 100f);
         
-        var dialog = new Dialog("ATTACK", skin);
+        var vampTable = new Table();
+        
+        var dialog = new Dialog("ATTACK", skin) {
+            @Override
+            protected void result(Object object) {
+                vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
+            }
+        };
         
         var table = dialog.getContentTable();
         
@@ -1902,6 +1987,7 @@ public class GameScreen extends JamScreen {
             vampireHealth -= damage;
             if (vampireHealth < 0) vampireHealth = 0;
             
+            if (vampireHealth <= 0) vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
             var label = new Label("You attacked the vampire for " + damage + ".\n" + (vampireHealth <= 0 ? "It slumps over and dies." : "It still has " + vampireHealth + " health."), skin, "small");
             label.setAlignment(Align.center);
             table.add(label);
@@ -1935,7 +2021,7 @@ public class GameScreen extends JamScreen {
             var reward = rewards.get(Math.min(beastiaryUnlock, 3));
             var vampireName = vampires.get(Math.min(beastiaryUnlock, 3)).toUpperCase(Locale.ROOT);
             table.row();
-            var label = new Label("YOU HAVE SLAIN THE "  + vampireName + ". You claim the reward of $" + formatMoney( reward), skin, "small");
+            var label = new Label("YOU HAVE SLAIN THE "  + vampireName + ". You claim the reward of $" + formatMoney(reward), skin, "small");
             table.add(label);
             
             cash += reward;
@@ -1967,7 +2053,20 @@ public class GameScreen extends JamScreen {
         dialog.show(stage);
         dialog.setSize(600, 325);
         dialog.setPosition(512 - MathUtils.floor(dialog.getWidth() / 2), 288 - MathUtils.floor(dialog.getHeight() / 2));
+        
+        vampTable.setBackground(skin.getDrawable("vamp-border-10"));
+        stage.addActor(vampTable);
+        vampTable.addAction(Actions.sequence(Actions.color(new Color(1, 1, 1, 0)), Actions.fadeIn(.25f)));
+        var image = new Image(skin, vampireImages.get(Math.min(beastiaryUnlock, 3)));
+        image.setScaling(Scaling.none);
+        vampTable.add(image);
+        vampTable.pack();
+        
+        temp.set(dialog.getX(Align.right), dialog.getY(Align.center));
+        vampTable.setPosition(temp.x, temp.y, Align.left);
     }
+    
+    private final static Vector2 temp = new Vector2();
     
     private void showWelcomeMessage() {
         var dialog = new Dialog("DAY ZERO", skin) {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.esotericsoftware.spine.Animation;
@@ -114,6 +115,7 @@ public class Resources {
         SkinSkinStyles.tbVerySmall = skin_skin.get("very-small", TextButton.TextButtonStyle.class);
         SkinSkinStyles.tbDefault = skin_skin.get("default", TextButton.TextButtonStyle.class);
         SkinSkinStyles.tbBig = skin_skin.get("big", TextButton.TextButtonStyle.class);
+        SkinSkinStyles.tfDefault = skin_skin.get("default", TextField.TextFieldStyle.class);
         SkinSkinStyles.ttDefault = skin_skin.get("default", TextTooltip.TextTooltipStyle.class);
         SkinSkinStyles.wDefault = skin_skin.get("default", Window.WindowStyle.class);
         sfx_bloodSplatter = assetManager.get("sfx/blood splatter.mp3");
@@ -266,6 +268,8 @@ public class Resources {
         public static TextButton.TextButtonStyle tbDefault;
 
         public static TextButton.TextButtonStyle tbBig;
+
+        public static TextField.TextFieldStyle tfDefault;
 
         public static TextTooltip.TextTooltipStyle ttDefault;
 

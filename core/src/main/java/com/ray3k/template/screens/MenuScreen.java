@@ -24,6 +24,8 @@ public class MenuScreen extends JamScreen {
     private Stage stage;
     private final static Color BG_COLOR = new Color(Color.BLACK);
     private SpineDrawable spineDrawable;
+    public static long lastScore;
+    public static String lastScoreName = "";
     
     @Override
     public void show() {
@@ -97,6 +99,27 @@ public class MenuScreen extends JamScreen {
             Gdx.input.setInputProcessor(null);
             core.transition(new CreditsScreen());
         });
+        
+        if (preferences.contains("highscore")) {
+            table.row();
+            subTable = new Table();
+            table.add(subTable);
+            
+            subTable.defaults().space(20);
+            if (!lastScoreName.equals("")) {
+                label = new Label("Score: " + lastScoreName + " " + lastScore, skin, "small");
+                subTable.add(label);
+            }
+            
+            label = new Label("Highscore: " + preferences.getString("highscore-name", "") + " " + preferences.getLong("highscore", 0), skin, "small");
+            subTable.add(label);
+            
+            textButton = new TextButton("SEE GLOBAL HIGH SCORES", skin, "very-small");
+            subTable.add(textButton);
+            onChange(textButton, () -> {
+                Gdx.net.openURI("https://gamejolt.com/games/dracwars/832631/scores/842990/best");
+            });
+        }
     }
     
     @Override
