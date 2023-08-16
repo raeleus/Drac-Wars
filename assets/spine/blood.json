@@ -1,0 +1,175 @@
+{
+"skeleton": { "hash": "KyKjSTZFoIc", "spine": "4.1.23", "width": 1024, "height": 576, "images": "", "audio": "" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "blood-drip-01", "parent": "root", "length": 43.16, "rotation": 0.92, "x": 756.12, "y": 237.7 },
+	{ "name": "blood-drip-02", "parent": "root", "length": 48.03, "x": 801.36, "y": 227.96 }
+],
+"slots": [
+	{ "name": "white", "bone": "root", "attachment": "white" },
+	{ "name": "blood-01", "bone": "root", "attachment": "blood-01" },
+	{ "name": "blood-02", "bone": "root", "attachment": "blood-02" },
+	{ "name": "blood-03", "bone": "root", "attachment": "blood-03" },
+	{ "name": "blood-04", "bone": "root", "attachment": "blood-04" },
+	{ "name": "blood-05", "bone": "root", "attachment": "blood-05" },
+	{ "name": "blood-drip-01", "bone": "blood-drip-01", "attachment": "blood-drip-01" },
+	{ "name": "blood-drip-02", "bone": "blood-drip-02", "attachment": "blood-drip-02" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"blood-01": {
+				"blood-01": { "path": "spine/blood-01", "x": 155.1, "y": 424.69, "width": 15, "height": 16 }
+			},
+			"blood-02": {
+				"blood-02": { "path": "spine/blood-02", "x": 251.25, "y": 402.66, "width": 26, "height": 27 }
+			},
+			"blood-03": {
+				"blood-03": { "path": "spine/blood-03", "x": 410.87, "y": 379.86, "width": 90, "height": 68 }
+			},
+			"blood-04": {
+				"blood-04": { "path": "spine/blood-04", "x": 586.98, "y": 333.06, "width": 91, "height": 88 }
+			},
+			"blood-05": {
+				"blood-05": { "path": "spine/blood-05", "x": 786.75, "y": 285.73, "width": 181, "height": 150 }
+			},
+			"blood-drip-01": {
+				"blood-drip-01": { "path": "spine/blood-drip-01", "x": -0.4, "y": -25.05, "rotation": -0.92, "width": 18, "height": 74 }
+			},
+			"blood-drip-02": {
+				"blood-drip-02": { "path": "spine/blood-drip-02", "x": 1.39, "y": -36.19, "width": 27, "height": 99 }
+			},
+			"white": {
+				"white": {
+					"path": "spine/white",
+					"color": "000000ff",
+					"x": 512,
+					"y": 288,
+					"scaleX": 1024,
+					"scaleY": 576,
+					"width": 1,
+					"height": 1
+				}
+			}
+		}
+	}
+],
+"events": {
+	"sfx/blood splatter": { "audio": "sfx/blood splatter.mp3" },
+	"sfx/drak wars": { "audio": "sfx/drak wars.mp3" }
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"blood-01": {
+				"attachment": [
+					{},
+					{ "time": 2.1667, "name": "blood-01" }
+				]
+			},
+			"blood-02": {
+				"attachment": [
+					{},
+					{ "time": 2.1333, "name": "blood-02" }
+				]
+			},
+			"blood-03": {
+				"attachment": [
+					{},
+					{ "time": 2.1, "name": "blood-03" }
+				]
+			},
+			"blood-04": {
+				"attachment": [
+					{},
+					{ "time": 2.0667, "name": "blood-04" }
+				]
+			},
+			"blood-05": {
+				"attachment": [
+					{},
+					{ "time": 2.0333, "name": "blood-05" }
+				]
+			},
+			"blood-drip-01": {
+				"attachment": [
+					{},
+					{ "time": 2.2, "name": "blood-drip-01" }
+				]
+			},
+			"blood-drip-02": {
+				"attachment": [
+					{},
+					{ "time": 2.2, "name": "blood-drip-02" }
+				]
+			}
+		},
+		"bones": {
+			"blood-drip-01": {
+				"translate": [
+					{
+						"time": 2.2,
+						"y": 46.28,
+						"curve": [ 4.467, 0, 6.733, 0, 5.064, 18.43, 6.286, 0.21 ]
+					},
+					{ "time": 9 }
+				]
+			},
+			"blood-drip-02": {
+				"translate": [
+					{
+						"time": 2.2,
+						"y": 77.58,
+						"curve": [ 3.8, 0, 5.4, 0, 4.221, 30.89, 5.084, 0.35 ]
+					},
+					{ "time": 7 }
+				]
+			}
+		},
+		"events": [
+			{ "time": 0.1333, "name": "sfx/drak wars" },
+			{ "time": 2, "name": "sfx/blood splatter" }
+		]
+	},
+	"stand": {
+		"slots": {
+			"blood-01": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-02": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-03": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-04": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-05": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-drip-01": {
+				"attachment": [
+					{}
+				]
+			},
+			"blood-drip-02": {
+				"attachment": [
+					{}
+				]
+			}
+		}
+	}
+}
+}

@@ -1,0 +1,135 @@
+{
+"skeleton": {
+	"hash": "aeBCKgHYSpY",
+	"spine": "4.1.23",
+	"x": -187.31,
+	"y": -54.21,
+	"width": 1411.29,
+	"height": 630.21,
+	"images": "",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "logo-raeleus", "parent": "root", "length": 439.04, "x": 512, "y": 288 },
+	{ "name": "spine/zebra", "parent": "root", "length": 209.6, "rotation": 0.37, "x": 538.75, "y": 7.6 },
+	{ "name": "spine/shroom", "parent": "root", "length": 181.03, "rotation": -0.86, "x": 1119.9, "y": 226.72 },
+	{ "name": "spine/befluffly", "parent": "root", "length": 187.82, "rotation": -0.42, "x": -124.06, "y": 155.95 }
+],
+"slots": [
+	{ "name": "white", "bone": "root", "color": "000000ff", "attachment": "white" },
+	{ "name": "logo-raeleus", "bone": "logo-raeleus", "attachment": "logo-shroomtime" },
+	{ "name": "spine/zebra", "bone": "spine/zebra", "attachment": "spine/zebra" },
+	{ "name": "spine/shroom", "bone": "spine/shroom", "attachment": "spine/shroom" },
+	{ "name": "spine/befluffly", "bone": "spine/befluffly", "attachment": "spine/befluffly" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"logo-raeleus": {
+				"logo-beflufflyorbegone": { "path": "spine/logo-beflufflyorbegone", "width": 910, "height": 68 },
+				"logo-raeleus": { "path": "spine/logo-raeleus", "width": 880, "height": 163 },
+				"logo-shroomtime": { "path": "spine/logo-shroomtime", "width": 879, "height": 105 }
+			},
+			"spine/befluffly": {
+				"spine/befluffly": { "x": 35.96, "y": 109.14, "rotation": 0.42, "width": 200, "height": 246 }
+			},
+			"spine/shroom": {
+				"spine/shroom": { "x": 2.75, "y": 88.52, "rotation": 0.86, "width": 200, "height": 201 }
+			},
+			"spine/zebra": {
+				"spine/zebra": { "x": 1.79, "y": 66.68, "rotation": -0.37, "width": 200, "height": 257 }
+			},
+			"white": {
+				"white": {
+					"path": "spine/white",
+					"x": 512,
+					"y": 288,
+					"scaleX": 1024,
+					"scaleY": 576,
+					"width": 1,
+					"height": 1
+				}
+			}
+		}
+	}
+],
+"events": {
+	"sfx/hee hee": { "audio": "sfx/hee hee.mp3" },
+	"sfx/hmm": { "audio": "sfx/hmm.mp3" },
+	"sfx/oh yeah": { "audio": "sfx/oh yeah.mp3" }
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"logo-raeleus": {
+				"attachment": [
+					{},
+					{ "time": 0.3333, "name": "logo-raeleus" },
+					{ "time": 1.0667, "name": "logo-beflufflyorbegone" },
+					{ "time": 1.8333, "name": "logo-shroomtime" },
+					{ "time": 2.5667 },
+					{ "time": 3.3333 }
+				]
+			}
+		},
+		"bones": {
+			"spine/zebra": {
+				"translate": [
+					{ "y": -213.68, "curve": "stepped" },
+					{ "time": 0.3333, "y": -213.68 },
+					{ "time": 0.5, "y": 17.81 },
+					{ "time": 1.2, "y": 17.81 },
+					{ "time": 1.3333, "y": -213.68 }
+				]
+			},
+			"spine/shroom": {
+				"rotate": [
+					{ "value": 180.45, "curve": "stepped" },
+					{ "time": 1.8333, "value": 180.45 },
+					{ "time": 2.0667, "value": 135.99, "curve": "stepped" },
+					{ "time": 2.8, "value": 135.99 },
+					{ "time": 3, "value": 180.45 }
+				],
+				"translate": [
+					{ "x": 55.8, "y": 311.67, "curve": "stepped" },
+					{ "time": 1.8333, "x": 55.8, "y": 311.67 },
+					{ "time": 2.0667, "x": -142.55, "y": 288.65 },
+					{ "time": 2.8, "x": -142.55, "y": 288.65 },
+					{ "time": 3, "x": 55.8, "y": 311.67 }
+				]
+			},
+			"spine/befluffly": {
+				"rotate": [
+					{ "time": 1.0667 },
+					{ "time": 1.3667, "value": -32.03, "curve": "stepped" },
+					{ "time": 2.2333, "value": -32.03 },
+					{ "time": 2.4 }
+				],
+				"translate": [
+					{ "x": -59.88, "y": -140.18, "curve": "stepped" },
+					{ "time": 1.0667, "x": -59.88, "y": -140.18 },
+					{ "time": 1.3667, "x": 152.96, "y": -122.25, "curve": "stepped" },
+					{ "time": 2.2333, "x": 152.96, "y": -122.25 },
+					{ "time": 2.4, "x": -153.79, "y": -130.66 }
+				]
+			}
+		},
+		"events": [
+			{ "time": 0.3333, "name": "sfx/oh yeah" },
+			{ "time": 1.0667, "name": "sfx/hee hee" },
+			{ "time": 1.8333, "name": "sfx/hmm" }
+		]
+	},
+	"stand": {
+		"slots": {
+			"logo-raeleus": {
+				"attachment": [
+					{}
+				]
+			}
+		}
+	}
+}
+}

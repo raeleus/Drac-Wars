@@ -1,0 +1,23 @@
+{
+"skeleton": { "hash": "Kf0TuFAa6hQ", "spine": "4.1.23", "width": 240, "height": 200, "images": "", "audio": "" },
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "spine/intro", "bone": "root", "attachment": "spine/intro" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"spine/intro": {
+				"spine/intro": { "x": 120, "y": 100, "width": 240, "height": 200 }
+			}
+		}
+	}
+],
+"animations": {
+	"animation": {},
+	"stand": {}
+}
+}

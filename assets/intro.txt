@@ -1,0 +1,5 @@
+{SLOWER}My dearest Mina,
+
+I write you under the gravest of circumstances. {WAIT=.2}A plague! A plague on mankind has swept over the Romanian countryside. {WAIT=.2}Animals have fallen to pestilence. {WAIT=.2}Entire crops lost. {WAIT=.2}The people have been overtaken by a mysterious melancholy. {WAIT=.4}Some even speak of demons stalking the night and stealing away the children. {WAIT=1}I am not one susceptible to the folklore of the peasantry, {WAIT=.5}but there is a truth to a dark evil in these lands.
+
+{WAIT=1.5}I wish to see you again, my beloved Mina, but these are tenuous times. {WAIT=.5}Stay away. {WAIT=1}Stay far away from this forsaken place. {WAIT=1}I have written to our leaders, captains of industry, the greatest minds of our time! {WAIT=1}Instead, we are visited upon by marketeers and soothsayers. {WAIT=1}Will no one deliver us from this wickedness? {WAIT=1}Only time will tell. {WAIT=1}Yes, someone must answer the call. {WAIT=1}Until then, I wish you well.

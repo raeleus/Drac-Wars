@@ -1,0 +1,6 @@
+sfx/blood splatter.mp3
+sfx/click.mp3
+sfx/drak wars.mp3
+sfx/hee hee.mp3
+sfx/hmm.mp3
+sfx/oh yeah.mp3
