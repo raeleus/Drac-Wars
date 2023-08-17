@@ -7,13 +7,15 @@ import com.badlogic.gdx.Net.HttpMethods;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 
+import static text.formic.Stringf.format;
+
 public class GameJoltApi {
     public static void addHighScore(long score, String name) {
         Net.HttpRequest httpRequest = new Net.HttpRequest(HttpMethods.GET);
         String gameID = Gdx.files.internal("secret/gameid").readString();
         String key = Gdx.files.internal("secret/key").readString();
         String url = "https://api.gamejolt.com/api/game/v1_2/scores/add/";
-        String content = "?game_id=" + gameID + "&guest=" + urlEncode(name) + "&score=" + score + "&sort=" + score;
+        String content = "?game_id=" + gameID + "&guest=" + urlEncode(name) + "&score=" + format("$%,d", score) + "&sort=" + score;
         String signature = encrypt(url + content + key);
         httpRequest.setUrl(url + content + "&signature=" + signature);
         

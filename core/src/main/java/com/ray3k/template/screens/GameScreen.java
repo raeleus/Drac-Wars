@@ -68,8 +68,8 @@ public class GameScreen extends JamScreen {
     public static int runAwayIndex;
     public final static int DOOR_MAX = 2;
     public static boolean inCastle;
-    public final static int POCKETS_OFFER_MINIMUM = 3;
-    public final static int POCKETS_OFFER_MAXIMUM = 10;
+    public final static int POCKETS_OFFER_MINIMUM = 6;
+    public final static int POCKETS_OFFER_MAXIMUM = 15;
     public final static int POCKETS_PRICE_MINIMUM = 200;
     public final static int POCKETS_PRICE_MAXIMUM = 500;
     public final static int CHEST_REWARD_MINIMUM = 20;
@@ -77,12 +77,12 @@ public class GameScreen extends JamScreen {
     public final static int CHEST_DAMAGE_MINIMUM = 5;
     public final static int CHEST_DAMAGE_MAXIMUM = 15;
     public final static float CHEST_REWARD_CHANCE = .6f;
-    public final static int SHARPENING_DAMAGE_MINIMUM = 1;
-    public final static int SHARPENING_DAMAGE_MAXIMUM = 3;
+    public final static int SHARPENING_DAMAGE_MINIMUM = 3;
+    public final static int SHARPENING_DAMAGE_MAXIMUM = 5;
     public final static int SHARPENING_PRICE_MINIMUM = 500;
     public final static int SHARPENING_PRICE_MAXIMUM = 1000;
-    public final static int FORMULA_HEALTH_MINIMUM = 1;
-    public final static int FORMULA_HEALTH_MAXIMUM = 5;
+    public final static int FORMULA_HEALTH_MINIMUM = 5;
+    public final static int FORMULA_HEALTH_MAXIMUM = 15;
     public final static int FORMULA_PRICE_MINIMUM = 200;
     public final static int FORMULA_PRICE_MAXIMUM = 600;
     public final static float TRAVEL_EVENT_CHANCE = .2f;
