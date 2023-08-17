@@ -32,7 +32,7 @@ public class IntroScreen extends JamScreen {
     public void show() {
         super.show();
         
-        speech = Gdx.audio.newMusic(Gdx.files.internal("bgm/intro.mp3"));
+        speech = bgm_intro;
         speech.play();
         
         stage = new Stage(new FitViewport(1024, 576), batch);
@@ -91,6 +91,9 @@ public class IntroScreen extends JamScreen {
                     speech.stop();
                     Gdx.input.setInputProcessor(null);
                     Core.core.transition(new GameScreen());
+                    bgm_menuIntro.stop();
+                    bgm_menu.stop();
+                    bgm_intro.stop();
                 }
             }
         });

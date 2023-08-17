@@ -1,6 +1,23 @@
 sfx/blood splatter.mp3
 sfx/click.mp3
+sfx/die.mp3
+sfx/door.mp3
 sfx/drak wars.mp3
+sfx/evil laugh.mp3
+sfx/finish.mp3
+sfx/grenade.mp3
+sfx/gun.mp3
+sfx/heal.mp3
 sfx/hee hee.mp3
 sfx/hmm.mp3
+sfx/hurt.mp3
+sfx/inventory.mp3
+sfx/magic.mp3
+sfx/money.mp3
 sfx/oh yeah.mp3
+sfx/pages.mp3
+sfx/portal.mp3
+sfx/slash.mp3
+sfx/vamp-attack.mp3
+sfx/vamp.mp3
+sfx/whip.mp3

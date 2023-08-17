@@ -1,6 +1,8 @@
 package com.ray3k.template.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.*;
@@ -16,13 +19,14 @@ import com.ray3k.template.*;
 
 import java.security.MessageDigest;
 import java.util.Locale;
-import java.util.Vector;
 
 import static com.ray3k.template.Core.*;
 import static com.ray3k.template.Resources.*;
 import static text.formic.Stringf.format;
 
 public class GameScreen extends JamScreen {
+    private static Music music;
+    private static Music oldMusic;
     public static GameScreen gameScreen;
     public static final Color BG_COLOR = new Color();
     public Stage stage;
@@ -86,7 +90,7 @@ public class GameScreen extends JamScreen {
     public final static ObjectMap<String, Integer> inventory = new ObjectMap<>();
     public final static ObjectMap<String, Integer> averagePaidPrice = new ObjectMap<>();
     public final static Array<String> vampires = new Array<>(new String[] {"Beast Vampire", "Bride Vampire", "Noble Vampire", "Pharaoh Vampire"});
-    public final static Array<String> vampireImages = new Array<>(new String[] {"beast", "bride", "noble", "pharoah"});
+    public final static Array<String> vampireImages = new Array<>(new String[] {"beast", "bride", "noble", "pharaoh"});
     public final static IntArray vampireDamages = new IntArray(new int[] {5, 10, 15, 20});
     public final static IntArray vampireAccuracies = new IntArray(new int[] {50, 60, 65, 70});
     public final static IntArray rewards = new IntArray(new int[] {2000, 3000, 10000, 100000});
@@ -95,6 +99,7 @@ public class GameScreen extends JamScreen {
     public final static int BAD_OMEN_VAMPIRE_ACCURACY_BONUS = 10;
     public final static Array<String> locations = new Array<>(new String[] {"Transylvania", "Wallachia", "Moldavia", "Dobruja", "Bukovina", "Crisana"});
     public final static Array<String> buildings = new Array<>(new String[] {"Castle", "Bank", "Weapons Dealer", "Soothsayer", "Loan Shark", "Healer"});
+    public final static Music[] locationMusics = new Music[] {bgm_Transylvania, bgm_WallachiaAndBukovina, bgm_Moldovia, bgm_DobrujaAndCrisana, bgm_WallachiaAndBukovina, bgm_DobrujaAndCrisana};
     public final static Array<String> surplusEventTexts = new Array<>();
     public final static Array<String> bustEventTexts = new Array<>();
     public final static Array<String> surplusItems = new Array<>();
@@ -111,6 +116,8 @@ public class GameScreen extends JamScreen {
     public final static float surplusPreferenceMax = -.3f;
     public final static IntArray basePrices = new IntArray(new int[]{10000, 100, 250, 800, 50000, 1000, 5000, 20, 10, 2500, 500, 60});
     public final static Array<String> weapons = new Array<>(new String[] {"Holy Sabre", "Anointed Whip", "Hand Cannon", "Devil's Crossbow", "Sol Grenada", "Lance of Longinus"});
+    public final static Sound[] weaponSounds = new Sound[] {sfx_slash, sfx_whip, sfx_gun, sfx_slash, sfx_grenade, sfx_slash};
+    public static Sound weaponSound;
     public final static IntArray weaponDamages = new IntArray(new int[] {10, 15, 25, 20, 50, 25});
     public final static IntArray weaponAccuracies = new IntArray(new int[] {60, 65, 50, 70, 40, 75});
     public final static IntArray weaponPrices = new IntArray(new int[] {1800, 2500, 5600, 7100, 20300, 100700});
@@ -132,6 +139,7 @@ public class GameScreen extends JamScreen {
         inventoryCount = 0;
         inventoryMax = 100;
         weapon = null;
+        weaponSound = sfx_slash;
         healthMax = 100;
         health = healthMax;
         damage = 0;
@@ -143,6 +151,10 @@ public class GameScreen extends JamScreen {
         averagePaidPrice.clear();
         beastiaryUnlock = 0;
         battleIntervals.clear();
+        music = bgm_WallachiaAndBukovina;
+        bgm_below50Hp.setVolume(0);
+        bgm_noMoneyOrItemsOnHand.setVolume(0);
+        bgm_hasDebtOrMoneyInBank.setVolume(0);
         
         locationPreferences.clear();
         for (var location : locations) {
@@ -168,6 +180,7 @@ public class GameScreen extends JamScreen {
         day++;
         location = locations.get(locationIndex);
         building = buildings.get(locationIndex);
+        var music = locationMusics[locationIndex];
         prices.clear();
         surplusItems.clear();
         bustItems.clear();
@@ -228,10 +241,13 @@ public class GameScreen extends JamScreen {
         
         if (day == 0) {
             showWelcomeMessage();
+            transitionMusic(music);
         } else if (battleIntervals.size > 0 && day == battleIntervals.first() && beastiaryUnlock < vampires.size) {
             battleIntervals.removeIndex(0);
+            transitionMusic(bgm_underAttack);
             showBattle();
         } else if (showSpecialEvent) {
+            transitionMusic(music);
             switch (MathUtils.random(7)) {
                 case 0:
                     showPocketEvent();
@@ -258,16 +274,15 @@ public class GameScreen extends JamScreen {
                     showHealEvent();
                     break;
             }
-        } else if (eventsText != null) showEventsDialog();
+        } else if (eventsText != null) {
+            showEventsDialog();
+            transitionMusic(music);
+        } else {
+            transitionMusic(music);
+        }
         
         goodOmen = false;
         badOmen = false;
-    }
-    
-    private void chooseWeapon(int weaponIndex) {
-        weapon = weapons.get(weaponIndex);
-        damage = weaponDamages.get(weaponIndex);
-        accuracy = weaponAccuracies.get(weaponIndex);
     }
     
     @Override
@@ -473,13 +488,72 @@ public class GameScreen extends JamScreen {
     
     @Override
     public void act(float delta) {
-        if (!bgm_menuIntro.isPlaying() && !bgm_menu.isPlaying()) {
-            bgm_menu.play();
-            bgm_menu.setVolume(core.bgm);
-            bgm_menu.setLooping(true);
+        if (!bgm_main.isPlaying()) {
+            bgm_main.play();
+            music.stop();
+            music.play();
+            bgm_noMoneyOrItemsOnHand.stop();
+            bgm_noMoneyOrItemsOnHand.play();
+            bgm_hasDebtOrMoneyInBank.stop();
+            bgm_hasDebtOrMoneyInBank.play();
+            bgm_below50Hp.stop();
+            bgm_below50Hp.play();
+        }
+        
+        if (health < 50) {
+            bgm_below50Hp.setVolume(Utils.approach(bgm_below50Hp.getVolume(), bgm, .5f * delta));
+        } else {
+            bgm_below50Hp.setVolume(Utils.approach(bgm_below50Hp.getVolume(), 0, .5f * delta));
+        }
+        
+        if (debt > 0 || bank > 0) {
+            bgm_hasDebtOrMoneyInBank.setVolume(Utils.approach(bgm_hasDebtOrMoneyInBank.getVolume(), bgm, .5f * delta));
+        } else {
+            bgm_hasDebtOrMoneyInBank.setVolume(Utils.approach(bgm_hasDebtOrMoneyInBank.getVolume(), 0, .5f * delta));
+        }
+        
+        if (cash == 0 && inventoryCount == 0) {
+            bgm_noMoneyOrItemsOnHand.setVolume(Utils.approach(bgm_noMoneyOrItemsOnHand.getVolume(), bgm, .5f * delta));
+        } else {
+            bgm_noMoneyOrItemsOnHand.setVolume(Utils.approach(bgm_noMoneyOrItemsOnHand.getVolume(), 0, .5f * delta));
         }
         
         stage.act(delta);
+    }
+    
+    public static void transitionMusic(Music newMusic) {
+        if (music != newMusic) {
+            oldMusic = music;
+            music = newMusic;
+            music.setPosition(oldMusic.getPosition());
+            music.play();
+            music.setVolume(0);
+            gameScreen.stage.addAction(new TemporalAction(2f) {
+                @Override
+                protected void end() {
+                    oldMusic.stop();
+                    music.setVolume(bgm);
+                }
+
+                @Override
+                protected void update(float percent) {
+                    oldMusic.setVolume((1 - percent) * bgm);
+                    music.setVolume(percent * bgm);
+                }
+            });
+        }
+    }
+    
+    public static void stopMusic() {
+        bgm_DobrujaAndCrisana.stop();
+        bgm_Moldovia.stop();
+        bgm_Transylvania.stop();
+        bgm_WallachiaAndBukovina.stop();
+        bgm_below50Hp.stop();
+        bgm_hasDebtOrMoneyInBank.stop();
+        bgm_noMoneyOrItemsOnHand.stop();
+        bgm_underAttack.stop();
+        bgm_main.stop();
     }
     
     @Override
@@ -552,6 +626,7 @@ public class GameScreen extends JamScreen {
         onChange(textButton, () -> {
             Gdx.input.setInputProcessor(null);
             core.transition(new MenuScreen());
+            stopMusic();
         });
         
         textButton = new TextButton("CANCEL", skin);
@@ -604,6 +679,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showFinish() {
+        sfx_finish.play(sfx);
         var dialog = new Dialog("THE SHIP DEPARTS", skin);
         
         var table = dialog.getContentTable();
@@ -653,6 +729,7 @@ public class GameScreen extends JamScreen {
             
             Gdx.input.setInputProcessor(null);
             core.transition(new MenuScreen());
+            stopMusic();
         });
         
         textButton.setDisabled(textField.getText().equals(""));
@@ -685,6 +762,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("ACCEPT", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_money.play(sfx);
                 debt = MathUtils.round(slider.getValue());
                 debtRate = loanRate;
                 cash += debt;
@@ -710,6 +788,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("PAY", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_money.play(sfx);
                 var value = Math.max(MathUtils.round(slider.getValue()), 0);
                 debt -= value;
                 if (debt == 0) debtRate = 0;
@@ -720,6 +799,7 @@ public class GameScreen extends JamScreen {
             textButton = new TextButton("ACCEPT BEATING", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_hurt.play(sfx);
                 health--;
                 if (health <= 0) {
                     health = 0;
@@ -735,6 +815,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("ACCEPT BEATING", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_hurt.play(sfx);
                 health--;
                 if (health <= 0) {
                     health = 0;
@@ -769,6 +850,7 @@ public class GameScreen extends JamScreen {
         var textButton = new TextButton("WITHDRAW", skin);
         dialogWithdraw.button(textButton);
         onChange(textButton, () -> {
+            sfx_money.play(sfx);
             var value = MathUtils.round(withdrawSlider.getValue());
             cash += value;
             bank -= value;
@@ -799,6 +881,7 @@ public class GameScreen extends JamScreen {
         textButton = new TextButton("DEPOSIT", skin);
         dialogDeposit.button(textButton);
         onChange(textButton, () -> {
+            sfx_money.play(sfx);
             var value = MathUtils.round(depositSlider.getValue());
             cash -= value;
             bank += value;
@@ -843,6 +926,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showGameOver() {
+        sfx_die.play(sfx);
         var dialog = new Dialog("THE DEARLY DEPARTED", skin);
         
         dialog.getContentTable().defaults().space(20);
@@ -865,6 +949,7 @@ public class GameScreen extends JamScreen {
         onChange(textButton, () -> {
             Gdx.input.setInputProcessor(null);
             core.transition(new MenuScreen());
+            stopMusic();
         });
         
         dialog.show(stage);
@@ -893,6 +978,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("PURCHASE HEALING", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_heal.play(sfx);
                 cash -= HEAL_PRICE;
                 health = healthMax;
                 populate();
@@ -918,6 +1004,7 @@ public class GameScreen extends JamScreen {
         dialog.getContentTable().padTop(20).padLeft(50).padRight(50);
         for (int i = 0; i < weapons.size; i++) {
             var weapon = weapons.get(i);
+            var weaponSound = weaponSounds[i];
             var accuracy = weaponAccuracies.get(i);
             var damage = weaponDamages.get(i);
             var price = weaponPrices.get(i);
@@ -955,7 +1042,9 @@ public class GameScreen extends JamScreen {
             }
             
             onChange(button, () -> {
+                sfx_inventory.play(sfx);
                 GameScreen.weapon = weapon;
+                GameScreen.weaponSound = weaponSound;
                 GameScreen.damage = damage;
                 GameScreen.accuracy = accuracy;
                 cash -= price;
@@ -1029,6 +1118,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showMarketTarot() {
+        sfx_magic.play(sfx);
         checkedFortune = true;
         var dialog = new Dialog("SOOTHSAYER", skin);
         
@@ -1071,6 +1161,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showBattleTarot() {
+        sfx_magic.play(sfx);
         checkedFortune = true;
         var index = MathUtils.random(2);
         var dialog = new Dialog("SOOTHSAYER", skin);
@@ -1116,6 +1207,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showLuckTarot() {
+        sfx_magic.play(sfx);
         checkedFortune = true;
         var goodOmen = MathUtils.randomBoolean();
         var dialog = new Dialog("SOOTHSAYER", skin);
@@ -1206,6 +1298,7 @@ public class GameScreen extends JamScreen {
         var textButton = new TextButton("BUY", skin);
         dialog.button(textButton);
         onChange(textButton, () -> {
+            sfx_inventory.play(sfx);
             var newCount = MathUtils.round(slider.getValue());
             cash -= price * newCount;
             inventoryCount += newCount;
@@ -1251,6 +1344,7 @@ public class GameScreen extends JamScreen {
         var textButton = new TextButton("SELL", skin);
         dialog.button(textButton);
         onChange(textButton, () -> {
+            sfx_money.play(sfx);
             var newCount = MathUtils.round(slider.getValue());
             cash += price * newCount;
             inventoryCount -= newCount;
@@ -1302,6 +1396,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("PURCHASE POCKETS", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_inventory.play(sfx);
                 cash -= price;
                 inventoryMax += pockets;
                 populate();
@@ -1337,6 +1432,7 @@ public class GameScreen extends JamScreen {
         dialog.button(textButton);
         onChange(textButton, () -> {
             if (MathUtils.randomBoolean(CHEST_REWARD_CHANCE)) {
+                sfx_money.play(sfx);
                 var dialog2 = new Dialog("FAT STACKS!", skin);
                 
                 var rewardLabel = new Label("You open the chest to discover $" + formatMoney(reward) + ".\nGotta get that paper!", skin, "small");
@@ -1365,6 +1461,8 @@ public class GameScreen extends JamScreen {
                 var rewardButton = new TextButton("OK", skin);
                 dialog2.button(rewardButton);
                 onChange(rewardButton, () -> {
+                    sfx_grenade.play(sfx);
+                    sfx_hurt.play(sfx);
                     health -= damage;
                     if (health <= 0) {
                         health = 0;
@@ -1441,6 +1539,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("PURCHASE SHARPENING", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_inventory.play(sfx);
                 cash -= price;
                 GameScreen.damage = damage;
                 populate();
@@ -1458,6 +1557,7 @@ public class GameScreen extends JamScreen {
     private int previewWeaponAccuracy;
     private String previewWeaponName;
     private int previewWeaponPrice;
+    private Sound previewWeaponSound;
     
     private void showWeaponEvent() {
         var hasWeapon = weapon != null;
@@ -1468,36 +1568,42 @@ public class GameScreen extends JamScreen {
                 previewWeaponDamage = 5;
                 previewWeaponAccuracy = 85;
                 previewWeaponPrice = 200;
+                previewWeaponSound = sfx_slash;
                 break;
             case (1):
                 previewWeaponName = "Cross of Saint Peter";
                 previewWeaponDamage = 10;
                 previewWeaponAccuracy = 75;
                 previewWeaponPrice = 2500;
+                previewWeaponSound = sfx_slash;
                 break;
             case (2):
                 previewWeaponName = "Key Blade";
                 previewWeaponDamage = 25;
                 previewWeaponAccuracy = 65;
                 previewWeaponPrice = 6000;
+                previewWeaponSound = sfx_slash;
                 break;
             case (3):
                 previewWeaponName = "Thumb Gun";
                 previewWeaponDamage = 30;
                 previewWeaponAccuracy = 60;
                 previewWeaponPrice = 7500;
+                previewWeaponSound = sfx_gun;
                 break;
             case (4):
                 previewWeaponName = "Ensorceled Garlic Clove";
                 previewWeaponDamage = 28;
                 previewWeaponAccuracy = 80;
                 previewWeaponPrice = 50000;
+                previewWeaponSound = sfx_slash;
                 break;
             case (5):
                 previewWeaponName = "God's Wrath";
                 previewWeaponDamage = 25;
                 previewWeaponAccuracy = 95;
                 previewWeaponPrice = 200000;
+                previewWeaponSound = sfx_slash;
                 break;
         }
         
@@ -1562,6 +1668,7 @@ public class GameScreen extends JamScreen {
                 GameScreen.damage = previewWeaponDamage;
                 GameScreen.accuracy = previewWeaponAccuracy;
                 GameScreen.weapon = previewWeaponName;
+                GameScreen.weaponSound = previewWeaponSound;
                 populate();
             });
         }
@@ -1574,6 +1681,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showBeastiary(int index) {
+        sfx_pages.play(sfx);
         var dialog = new Dialog("BEASTIARY", skin);
         
         var table = dialog.getContentTable();
@@ -1647,6 +1755,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showBrigandEvent() {
+        sfx_evilLaugh.play(sfx);
         var dialog = new Dialog("BRIGANDS", skin) {
             @Override
             public void hide(Action action) {
@@ -1678,6 +1787,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showMobEvent() {
+        sfx_evilLaugh.play(sfx);
         var dialog = new Dialog("MOB", skin) {
             @Override
             public void hide(Action action) {
@@ -1749,6 +1859,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("PURCHASE FORMULA", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_heal.play(sfx);
                 cash -= price;
                 healthMax += healthIncrease;
                 health = healthMax;
@@ -1790,6 +1901,7 @@ public class GameScreen extends JamScreen {
         var textButton = new TextButton("EAT THE PIXIE", skin);
         dialog.button(textButton);
         onChange(textButton, () -> {
+            sfx_heal.play(sfx);
             health = healthMax;
             populate();
         });
@@ -1803,6 +1915,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showBattle() {
+        sfx_vamp.play(sfx);
         vampireHealth = VAMPIRE_HEALTH_MAX;
         var vampTable = new Table();
         var dialog = new Dialog("VAMPIRE ATTACK", skin) {
@@ -1884,6 +1997,7 @@ public class GameScreen extends JamScreen {
         table.defaults().space(20);
         table.pad(10);
         if (success) {
+            transitionMusic(locationMusics[locations.indexOf(location, false)]);
             vampTable.addAction(Actions.sequence(Actions.fadeOut(.25f), Actions.removeActor()));
             
             var label = new Label("You managed to get away!", skin, "small");
@@ -1908,6 +2022,8 @@ public class GameScreen extends JamScreen {
             table.add(label);
             
             if (hurt) {
+                sfx_vampAttack.play(sfx);
+                sfx_hurt.play(sfx);
                 var damage = vampireDamages.get(Math.min(beastiaryUnlock, 3));
                 health -= damage;
                 if (health <= 0) health = 0;
@@ -1984,6 +2100,7 @@ public class GameScreen extends JamScreen {
         table.defaults().space(20);
         table.pad(10);
         if (success) {
+            weaponSound.play(sfx);
             vampireHealth -= damage;
             if (vampireHealth < 0) vampireHealth = 0;
             
@@ -1997,6 +2114,7 @@ public class GameScreen extends JamScreen {
         }
         
         if (hurt) {
+            sfx_hurt.play(sfx);
             var damage = vampireDamages.get(Math.min(beastiaryUnlock, 3));
             health -= damage;
             if (health <= 0) health = 0;
@@ -2100,6 +2218,7 @@ public class GameScreen extends JamScreen {
     }
     
     private void showCastle() {
+        sfx_portal.play(sfx);
         var dialog = new Dialog("CASTLE", skin);
         
         dialog.getContentTable().defaults().space(20);
@@ -2146,6 +2265,7 @@ public class GameScreen extends JamScreen {
             var textButton = new TextButton("OPEN A DOOR", skin);
             dialog.button(textButton);
             onChange(textButton, () -> {
+                sfx_door.play(sfx);
                 switch (MathUtils.random(7)) {
                     case 0:
                         if (beastiaryUnlock < vampires.size) {

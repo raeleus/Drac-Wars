@@ -1,4 +1,13 @@
 bgm/audio-sample.mp3
-bgm/intro.mp3
-bgm/menu-intro.mp3
-bgm/menu.mp3
+bgm/below_50_hp.ogg
+bgm/Dobruja_and_Crisana.ogg
+bgm/has_debt_or_money_in_bank.ogg
+bgm/intro.ogg
+bgm/main.ogg
+bgm/menu-intro.ogg
+bgm/menu.ogg
+bgm/Moldovia.ogg
+bgm/no_money_or_items_on_hand.ogg
+bgm/Transylvania.ogg
+bgm/under_attack.ogg
+bgm/Wallachia_and_Bukovina.ogg

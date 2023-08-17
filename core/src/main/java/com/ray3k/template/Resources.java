@@ -30,21 +30,73 @@ public class Resources {
 
     public static Sound sfx_click;
 
+    public static Sound sfx_die;
+
+    public static Sound sfx_door;
+
     public static Sound sfx_drakWars;
+
+    public static Sound sfx_evilLaugh;
+
+    public static Sound sfx_finish;
+
+    public static Sound sfx_grenade;
+
+    public static Sound sfx_gun;
+
+    public static Sound sfx_heal;
 
     public static Sound sfx_heeHee;
 
     public static Sound sfx_hmm;
 
+    public static Sound sfx_hurt;
+
+    public static Sound sfx_inventory;
+
+    public static Sound sfx_magic;
+
+    public static Sound sfx_money;
+
     public static Sound sfx_ohYeah;
+
+    public static Sound sfx_pages;
+
+    public static Sound sfx_portal;
+
+    public static Sound sfx_slash;
+
+    public static Sound sfx_vampAttack;
+
+    public static Sound sfx_vamp;
+
+    public static Sound sfx_whip;
 
     public static Music bgm_audioSample;
 
+    public static Music bgm_below50Hp;
+
+    public static Music bgm_DobrujaAndCrisana;
+
+    public static Music bgm_hasDebtOrMoneyInBank;
+
     public static Music bgm_intro;
+
+    public static Music bgm_main;
 
     public static Music bgm_menuIntro;
 
     public static Music bgm_menu;
+
+    public static Music bgm_Moldovia;
+
+    public static Music bgm_noMoneyOrItemsOnHand;
+
+    public static Music bgm_Transylvania;
+
+    public static Music bgm_underAttack;
+
+    public static Music bgm_WallachiaAndBukovina;
 
     public static void loadResources(AssetManager assetManager) {
         textures_textures = assetManager.get("textures/textures.atlas");
@@ -120,14 +172,40 @@ public class Resources {
         SkinSkinStyles.wDefault = skin_skin.get("default", Window.WindowStyle.class);
         sfx_bloodSplatter = assetManager.get("sfx/blood splatter.mp3");
         sfx_click = assetManager.get("sfx/click.mp3");
+        sfx_die = assetManager.get("sfx/die.mp3");
+        sfx_door = assetManager.get("sfx/door.mp3");
         sfx_drakWars = assetManager.get("sfx/drak wars.mp3");
+        sfx_evilLaugh = assetManager.get("sfx/evil laugh.mp3");
+        sfx_finish = assetManager.get("sfx/finish.mp3");
+        sfx_grenade = assetManager.get("sfx/grenade.mp3");
+        sfx_gun = assetManager.get("sfx/gun.mp3");
+        sfx_heal = assetManager.get("sfx/heal.mp3");
         sfx_heeHee = assetManager.get("sfx/hee hee.mp3");
         sfx_hmm = assetManager.get("sfx/hmm.mp3");
+        sfx_hurt = assetManager.get("sfx/hurt.mp3");
+        sfx_inventory = assetManager.get("sfx/inventory.mp3");
+        sfx_magic = assetManager.get("sfx/magic.mp3");
+        sfx_money = assetManager.get("sfx/money.mp3");
         sfx_ohYeah = assetManager.get("sfx/oh yeah.mp3");
+        sfx_pages = assetManager.get("sfx/pages.mp3");
+        sfx_portal = assetManager.get("sfx/portal.mp3");
+        sfx_slash = assetManager.get("sfx/slash.mp3");
+        sfx_vampAttack = assetManager.get("sfx/vamp-attack.mp3");
+        sfx_vamp = assetManager.get("sfx/vamp.mp3");
+        sfx_whip = assetManager.get("sfx/whip.mp3");
         bgm_audioSample = assetManager.get("bgm/audio-sample.mp3");
-        bgm_intro = assetManager.get("bgm/intro.mp3");
-        bgm_menuIntro = assetManager.get("bgm/menu-intro.mp3");
-        bgm_menu = assetManager.get("bgm/menu.mp3");
+        bgm_below50Hp = assetManager.get("bgm/below_50_hp.ogg");
+        bgm_DobrujaAndCrisana = assetManager.get("bgm/Dobruja_and_Crisana.ogg");
+        bgm_hasDebtOrMoneyInBank = assetManager.get("bgm/has_debt_or_money_in_bank.ogg");
+        bgm_intro = assetManager.get("bgm/intro.ogg");
+        bgm_main = assetManager.get("bgm/main.ogg");
+        bgm_menuIntro = assetManager.get("bgm/menu-intro.ogg");
+        bgm_menu = assetManager.get("bgm/menu.ogg");
+        bgm_Moldovia = assetManager.get("bgm/Moldovia.ogg");
+        bgm_noMoneyOrItemsOnHand = assetManager.get("bgm/no_money_or_items_on_hand.ogg");
+        bgm_Transylvania = assetManager.get("bgm/Transylvania.ogg");
+        bgm_underAttack = assetManager.get("bgm/under_attack.ogg");
+        bgm_WallachiaAndBukovina = assetManager.get("bgm/Wallachia_and_Bukovina.ogg");
     }
 
     public static class SpineBlood {
