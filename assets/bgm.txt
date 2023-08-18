@@ -8,6 +8,8 @@ bgm/menu-intro.ogg
 bgm/menu.ogg
 bgm/Moldovia.ogg
 bgm/no_money_or_items_on_hand.ogg
+bgm/Results_INTRO.ogg
+bgm/Results_LOOP.ogg
 bgm/Transylvania.ogg
 bgm/under_attack.ogg
 bgm/Wallachia_and_Bukovina.ogg

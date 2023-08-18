@@ -92,6 +92,10 @@ public class Resources {
 
     public static Music bgm_noMoneyOrItemsOnHand;
 
+    public static Music bgm_ResultsINTRO;
+
+    public static Music bgm_ResultsLOOP;
+
     public static Music bgm_Transylvania;
 
     public static Music bgm_underAttack;
@@ -203,6 +207,8 @@ public class Resources {
         bgm_menu = assetManager.get("bgm/menu.ogg");
         bgm_Moldovia = assetManager.get("bgm/Moldovia.ogg");
         bgm_noMoneyOrItemsOnHand = assetManager.get("bgm/no_money_or_items_on_hand.ogg");
+        bgm_ResultsINTRO = assetManager.get("bgm/Results_INTRO.ogg");
+        bgm_ResultsLOOP = assetManager.get("bgm/Results_LOOP.ogg");
         bgm_Transylvania = assetManager.get("bgm/Transylvania.ogg");
         bgm_underAttack = assetManager.get("bgm/under_attack.ogg");
         bgm_WallachiaAndBukovina = assetManager.get("bgm/Wallachia_and_Bukovina.ogg");

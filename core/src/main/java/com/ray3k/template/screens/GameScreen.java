@@ -146,7 +146,7 @@ public class GameScreen extends JamScreen {
         accuracy = 0;
         runAwayIndex = 0;
         day = -1;
-        dayMax = 30;
+        dayMax = 2;
         inventory.clear();
         averagePaidPrice.clear();
         beastiaryUnlock = 0;
@@ -155,6 +155,7 @@ public class GameScreen extends JamScreen {
         bgm_below50Hp.setVolume(0);
         bgm_noMoneyOrItemsOnHand.setVolume(0);
         bgm_hasDebtOrMoneyInBank.setVolume(0);
+        bgm_main.setVolume(bgm);
         
         locationPreferences.clear();
         for (var location : locations) {
@@ -488,9 +489,24 @@ public class GameScreen extends JamScreen {
     
     @Override
     public void act(float delta) {
-        if (!bgm_main.isPlaying()) {
+        if (music == bgm_ResultsLOOP) {
+            bgm_DobrujaAndCrisana.stop();
+            bgm_Moldovia.stop();
+            bgm_Transylvania.stop();
+            bgm_WallachiaAndBukovina.stop();
+            bgm_below50Hp.stop();
+            bgm_hasDebtOrMoneyInBank.stop();
+            bgm_noMoneyOrItemsOnHand.stop();
+            bgm_underAttack.stop();
+            bgm_main.stop();
+        } else if (!bgm_main.isPlaying()) {
+            bgm_main.stop();
             bgm_main.play();
             music.stop();
+            if (music == bgm_ResultsINTRO) {
+                music = bgm_ResultsLOOP;
+                music.setLooping(true);
+            }
             music.play();
             bgm_noMoneyOrItemsOnHand.stop();
             bgm_noMoneyOrItemsOnHand.play();
@@ -554,6 +570,8 @@ public class GameScreen extends JamScreen {
         bgm_noMoneyOrItemsOnHand.stop();
         bgm_underAttack.stop();
         bgm_main.stop();
+        bgm_ResultsINTRO.stop();
+        bgm_ResultsLOOP.stop();
     }
     
     @Override
@@ -679,7 +697,18 @@ public class GameScreen extends JamScreen {
     }
     
     private void showFinish() {
-        sfx_finish.play(sfx);
+        gameScreen.stage.addAction(new TemporalAction(2f) {
+            @Override
+            protected void end() {
+                bgm_main.stop();
+            }
+            
+            @Override
+            protected void update(float percent) {
+                bgm_main.setVolume((1 - percent) * bgm);
+            }
+        });
+        transitionMusic(bgm_ResultsINTRO);
         var dialog = new Dialog("THE SHIP DEPARTS", skin);
         
         var table = dialog.getContentTable();
