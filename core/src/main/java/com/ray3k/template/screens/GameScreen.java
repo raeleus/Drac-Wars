@@ -146,16 +146,48 @@ public class GameScreen extends JamScreen {
         accuracy = 0;
         runAwayIndex = 0;
         day = -1;
-        dayMax = 2;
+        dayMax = 30;
         inventory.clear();
         averagePaidPrice.clear();
         beastiaryUnlock = 0;
         battleIntervals.clear();
-        music = bgm_WallachiaAndBukovina;
+        
+        bgm_DobrujaAndCrisana.setLooping(true);
+        bgm_Moldovia.setLooping(true);
+        bgm_Transylvania.setLooping(true);
+        bgm_WallachiaAndBukovina.setLooping(true);
+        bgm_below50Hp.setLooping(true);
+        bgm_hasDebtOrMoneyInBank.setLooping(true);
+        bgm_noMoneyOrItemsOnHand.setLooping(true);
+        bgm_underAttack.setLooping(true);
+        bgm_main.setLooping(true);
+        bgm_ResultsLOOP.setLooping(true);
+        
+        bgm_DobrujaAndCrisana.setVolume(0);
+        bgm_Moldovia.setVolume(0);
+        bgm_Transylvania.setVolume(0);
+        bgm_WallachiaAndBukovina.setVolume(0);
         bgm_below50Hp.setVolume(0);
-        bgm_noMoneyOrItemsOnHand.setVolume(0);
         bgm_hasDebtOrMoneyInBank.setVolume(0);
-        bgm_main.setVolume(bgm);
+        bgm_noMoneyOrItemsOnHand.setVolume(0);
+        bgm_underAttack.setVolume(0);
+        bgm_main.setVolume(0);
+        bgm_ResultsINTRO.setVolume(bgm);
+        bgm_ResultsLOOP.setVolume(0);
+        
+        bgm_DobrujaAndCrisana.play();
+        bgm_Moldovia.play();
+        bgm_Transylvania.play();
+        bgm_WallachiaAndBukovina.play();
+        bgm_below50Hp.play();
+        bgm_hasDebtOrMoneyInBank.play();
+        bgm_noMoneyOrItemsOnHand.play();
+        bgm_underAttack.play();
+        bgm_main.play();
+        
+        fadeInMusic(bgm_main);
+        fadeInMusic(bgm_WallachiaAndBukovina);
+        music = bgm_WallachiaAndBukovina;
         
         locationPreferences.clear();
         for (var location : locations) {
@@ -489,46 +521,26 @@ public class GameScreen extends JamScreen {
     
     @Override
     public void act(float delta) {
-        if (music == bgm_ResultsLOOP) {
-            bgm_DobrujaAndCrisana.stop();
-            bgm_Moldovia.stop();
-            bgm_Transylvania.stop();
-            bgm_WallachiaAndBukovina.stop();
-            bgm_below50Hp.stop();
-            bgm_hasDebtOrMoneyInBank.stop();
-            bgm_noMoneyOrItemsOnHand.stop();
-            bgm_underAttack.stop();
-            bgm_main.stop();
-        } else if (!bgm_main.isPlaying()) {
-            bgm_main.stop();
-            bgm_main.play();
-            music.stop();
-            if (music == bgm_ResultsINTRO) {
-                music = bgm_ResultsLOOP;
-                music.setLooping(true);
-            }
+        var playingResults = music == bgm_ResultsINTRO;
+        if (playingResults && !music.isPlaying()) {
+            music = bgm_ResultsLOOP;
+            music.setVolume(bgm);
             music.play();
-            bgm_noMoneyOrItemsOnHand.stop();
-            bgm_noMoneyOrItemsOnHand.play();
-            bgm_hasDebtOrMoneyInBank.stop();
-            bgm_hasDebtOrMoneyInBank.play();
-            bgm_below50Hp.stop();
-            bgm_below50Hp.play();
         }
         
-        if (health < 50) {
+        if (health < 50 && !playingResults) {
             bgm_below50Hp.setVolume(Utils.approach(bgm_below50Hp.getVolume(), bgm, .5f * delta));
         } else {
             bgm_below50Hp.setVolume(Utils.approach(bgm_below50Hp.getVolume(), 0, .5f * delta));
         }
         
-        if (debt > 0 || bank > 0) {
+        if ((debt > 0 || bank > 0) && !playingResults) {
             bgm_hasDebtOrMoneyInBank.setVolume(Utils.approach(bgm_hasDebtOrMoneyInBank.getVolume(), bgm, .5f * delta));
         } else {
             bgm_hasDebtOrMoneyInBank.setVolume(Utils.approach(bgm_hasDebtOrMoneyInBank.getVolume(), 0, .5f * delta));
         }
         
-        if (cash == 0 && inventoryCount == 0) {
+        if (cash == 0 && inventoryCount == 0 && !playingResults) {
             bgm_noMoneyOrItemsOnHand.setVolume(Utils.approach(bgm_noMoneyOrItemsOnHand.getVolume(), bgm, .5f * delta));
         } else {
             bgm_noMoneyOrItemsOnHand.setVolume(Utils.approach(bgm_noMoneyOrItemsOnHand.getVolume(), 0, .5f * delta));
@@ -537,17 +549,32 @@ public class GameScreen extends JamScreen {
         stage.act(delta);
     }
     
+    public static void fadeInMusic(Music music) {
+        gameScreen.stage.addAction(new TemporalAction(2f) {
+            @Override
+            protected void update(float percent) {
+                music.setVolume(percent * bgm);
+            }
+        });
+    }
+    
+    public static void fadeOutMusic(Music music) {
+        gameScreen.stage.addAction(new TemporalAction(2f) {
+            @Override
+            protected void update(float percent) {
+                music.setVolume((1 - percent) * bgm);
+            }
+        });
+    }
+    
     public static void transitionMusic(Music newMusic) {
         if (music != newMusic) {
             oldMusic = music;
             music = newMusic;
-            music.setPosition(oldMusic.getPosition());
-            music.play();
             music.setVolume(0);
             gameScreen.stage.addAction(new TemporalAction(2f) {
                 @Override
                 protected void end() {
-                    oldMusic.stop();
                     music.setVolume(bgm);
                 }
 
@@ -697,17 +724,8 @@ public class GameScreen extends JamScreen {
     }
     
     private void showFinish() {
-        gameScreen.stage.addAction(new TemporalAction(2f) {
-            @Override
-            protected void end() {
-                bgm_main.stop();
-            }
-            
-            @Override
-            protected void update(float percent) {
-                bgm_main.setVolume((1 - percent) * bgm);
-            }
-        });
+        fadeOutMusic(bgm_main);
+        bgm_ResultsINTRO.play();
         transitionMusic(bgm_ResultsINTRO);
         var dialog = new Dialog("THE SHIP DEPARTS", skin);
         
@@ -747,7 +765,7 @@ public class GameScreen extends JamScreen {
         dialog.button(textButton);
         onChange(textButton, () -> {
             MenuScreen.lastScoreName = textField.getText();
-            MenuScreen.lastScore = cash + bank - debt;
+            MenuScreen.lastScore = Math.max(cash + bank - debt, 0);
             if (MenuScreen.lastScore > preferences.getLong("highscore", -Long.MAX_VALUE)) {
                 preferences.putString("highscore-name", textField.getText());
                 preferences.putLong("highscore", MenuScreen.lastScore);
