@@ -2065,8 +2065,14 @@ public class GameScreen extends JamScreen {
             });
         } else {
             table.row();
-            var label = new Label("You tried to escape and failed!", skin, "small");
+            var label = new Label("You tried to escape and failed!", skin);
             table.add(label);
+            
+            if (runAwayIndex > 0) {
+                table.row();
+                label = new Label("This vampire is faster than anything you've seen before!", skin, "small");
+                table.add(label);
+            }
             
             if (hurt) {
                 sfx_vampAttack.play(sfx);
